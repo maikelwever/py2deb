@@ -163,6 +163,8 @@ def main():
             elif option == '--use-system-package':
                 python_package_name, _, debian_package_name = value.partition(',')
                 converter.use_system_package(python_package_name, debian_package_name)
+            elif option == '--system-package-list-file':
+                converter.set_system_package_list_file(value)
             elif option == '--name-prefix':
                 converter.set_name_prefix(value)
             elif option == '--no-name-prefix':

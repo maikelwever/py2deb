@@ -118,6 +118,26 @@ class PackageConverter(object):
             raise ValueError("Please provide a nonempty name prefix!")
         self.name_prefix = prefix
 
+    def set_system_package_list_file(self, filepath):
+        """
+        Reads the given filepath and feeds each line to `use_system_package`.
+
+        :param debian_package_name: The path of the file to read exclusions from.
+        :raises: :exc:`~exceptions.ValueError` when the file was not found
+                 or contains errors.
+
+         This will achieve the same as setting the mapping by hand.
+         References to the Python package are replaced with a specific Debian
+         package name. This allows you to use system packages for specific
+         Python requirements.
+        """
+        with open(filepath, 'r') as f:
+            for i in f.readlines():
+                i = i.strip()
+                if i:
+                    python_package_name, _, debian_package_name = i.partition(',')
+                    self.use_system_package(python_package_name, debian_package_name)
+
     def use_system_package(self, python_package_name, debian_package_name):
         """
         Exclude a Python package from conversion.
@@ -457,6 +477,8 @@ class PackageConverter(object):
             self.set_lintian_enabled(parser.get('py2deb', 'lintian'))
         if parser.has_option('py2deb', 'python-callback'):
             self.set_python_callback(parser.get('py2deb', 'python-callback'))
+        if parser.has_option('py2deb', 'system-package-list-file'):
+            self.set_system_package_list_file(parser.get('py2deb', 'system-package-list-file'))
         # Apply the defined alternatives.
         if parser.has_section('alternatives'):
             for link, path in parser.items('alternatives'):
